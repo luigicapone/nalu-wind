@@ -183,9 +183,9 @@ AssembleContinuityEdgeSolverAlgorithm::execute()
         const double kxj = axj - asq*inv_axdx*dxj; // NOC
         const double rhoUjIp = 0.5*(densityR*vrtmR[j] + densityL*vrtmL[j]);
         const double ujIp = 0.5*(vrtmR[j] + vrtmL[j]);
-        const double GjIp = 0.5*(GpdxR[j] + GpdxL[j]);
-        tmdot += (interpTogether*rhoUjIp + om_interpTogether*rhoIp*ujIp + projTimeScale*GjIp)*axj 
-          - projTimeScale*kxj*GjIp*nocFac;
+        const double GjIp = 0.5*(GpdxR[j] / udiagR + GpdxL[j] / udiagL);
+        tmdot += (interpTogether*rhoUjIp + om_interpTogether*rhoIp*ujIp + GjIp)*axj
+          - kxj*GjIp*nocFac;
       }
 
       const double lhsfac = -asq*inv_axdx*projTimeScale;
