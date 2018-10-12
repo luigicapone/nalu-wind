@@ -250,6 +250,9 @@ SolutionOptions::load(const YAML::Node & y_node)
         else if (expect_map(y_option, "upw_factor", optional)) {
           y_option["upw_factor"] >> upwMap_ ;
         }
+        else if (expect_map(y_option, "relaxation_factor", optional)) {
+          y_option["relaxtion_factor"] >> relaxFactorMap_;
+        }
         else if (expect_map(y_option, "limiter", optional)) {
           y_option["limiter"] >> limiterMap_ ;
         }
@@ -732,6 +735,18 @@ SolutionOptions::get_upw_factor(const std::string& dofName) const
   auto iter = upwMap_.find(dofName);
 
   if (iter != upwMap_.end())
+    factor = iter->second;
+
+  return factor;
+}
+
+double
+SolutionOptions::get_relaxation_factor(const std::string& dofName) const
+{
+  double factor = relaxFactorDefault_;
+
+  auto iter = relaxFactorMap_.find(dofName);
+  if (iter != relaxFactorMap_.end())
     factor = iter->second;
 
   return factor;

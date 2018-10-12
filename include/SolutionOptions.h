@@ -79,6 +79,8 @@ public:
 
   double get_upw_factor(const std::string&) const;
 
+  double get_relaxation_factor(const std::string&) const;
+
   bool primitive_uses_limiter(const std::string&) const;
 
   bool get_shifted_grad_op(const std::string&) const;
@@ -98,6 +100,8 @@ public:
   double alphaDefault_;
   double alphaUpwDefault_;
   double upwDefault_;
+  // Relaxation factors for equations
+  double relaxFactorDefault_{1.0};
   double lamScDefault_;
   double turbScDefault_;
   double turbPrDefault_;
@@ -180,6 +184,7 @@ public:
   std::map<std::string, double> alphaMap_;
   std::map<std::string, double> alphaUpwMap_;
   std::map<std::string, double> upwMap_;
+  std::map<std::string, double> relaxFactorMap_;
   std::map<std::string, bool> limiterMap_;
   std::map<std::string, std::string> tanhFormMap_;
   std::map<std::string, double> tanhTransMap_;
