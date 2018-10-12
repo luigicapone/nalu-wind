@@ -171,6 +171,16 @@ SolutionOptions::load(const YAML::Node & y_node)
     // quadrature type for high order
     get_if_present(y_solution_options, "tensor_product_cvfem", newHO_);
 
+    std::string projected_timescale_type = "default";
+    get_if_present(y_solution_options, "projected_timescale_type",
+                   projected_timescale_type, projected_timescale_type);
+    if (projected_timescale_type == "default")
+      tscaleType_ = TSCALE_DEFAULT;
+    else if (projected_timescale_type == "momentum_diag_inv")
+      tscaleType_ = TSCALE_UDIAGINV;
+    else
+      throw std::runtime_error("SolutionOptions: Invalid option provided for projected_timescale_type");
+
     // extract turbulence model; would be nice if we could parse an enum..
     std::string specifiedTurbModel;
     std::string defaultTurbModel = "laminar";

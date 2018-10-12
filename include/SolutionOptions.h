@@ -34,6 +34,14 @@ enum ErrorIndicatorType {
   EIT_SIMPLE_DUDX2        = EIT_SIMPLE_BASE + (1 << 6)
 };
 
+/** Form of projection timescale used in pressure equation
+ *
+ */
+enum ProjTScaleType {
+  TSCALE_DEFAULT = 0,  //!< Original Nalu implementation
+  TSCALE_UDIAGINV = 1, //!< 1/diag(A_p) implementation
+  NUM_TSCALE_TYPES
+};
 
 class SolutionOptions
 {
@@ -216,6 +224,8 @@ public:
   bool needPressureReference_{false};
 
   std::unique_ptr<FixPressureAtNodeInfo> fixPressureInfo_;
+
+  ProjTScaleType tscaleType_{TSCALE_DEFAULT};
 
   std::string name_;
 

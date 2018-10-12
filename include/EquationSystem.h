@@ -9,7 +9,8 @@
 #ifndef EquationSystem_h
 #define EquationSystem_h
 
-#include<NaluParsing.h>
+#include "KokkosInterface.h"
+#include "NaluParsing.h"
 #include "Realm.h"
 #include "PecletFunction.h"
 
@@ -277,6 +278,18 @@ public:
 
   virtual void post_converged_work() {}
 
+  virtual void save_diagonal_term(
+    const std::vector<stk::mesh::Entity>&,
+    const std::vector<int>&,
+    const std::vector<double>&
+  ) {}
+
+  virtual void save_diagonal_term(
+    unsigned,
+    const stk::mesh::Entity*,
+    const SharedMemView<const double**>&
+  ) {}
+
   std::vector<AuxFunctionAlgorithm *> bcDataAlg_;
   std::vector<Algorithm *> bcDataMapAlg_;
   std::vector<Algorithm *> copyStateAlg_;
@@ -293,6 +306,8 @@ public:
 
   /// List of tasks to be performed after each EquationSystem::solve_and_update
   std::vector<AlgorithmDriver*> postIterAlgDriver_;
+
+  bool extractDiagonal_{false};
 
   // owner equation system
   /*EquationSystem *ownerEqs_;*/
