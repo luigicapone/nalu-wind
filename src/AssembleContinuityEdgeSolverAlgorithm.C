@@ -84,11 +84,6 @@ AssembleContinuityEdgeSolverAlgorithm::execute()
   const double nocFac
     = (realm_.get_noc_usage(dofName) == true) ? 1.0 : 0.0;
 
-  // time step
-  const double dt = realm_.get_time_step();
-  const double gamma1 = realm_.get_gamma1();
-  const double projTimeScale = dt/gamma1;
-
   // deal with interpolation procedure
   const double interpTogether = realm_.get_mdot_interp();
   const double om_interpTogether = 1.0-interpTogether;
@@ -110,6 +105,8 @@ AssembleContinuityEdgeSolverAlgorithm::execute()
 
   // deal with state
   ScalarFieldType &densityNp1 = density_->field_of_state(stk::mesh::StateNP1);
+  ScalarFieldType* Udiag = meta_data.get_field<ScalarFieldType>(
+    stk::topology::NODE_RANK, "momentum_diag");
 
   // define some common selectors
   stk::mesh::Selector s_locally_owned_union = meta_data.locally_owned_part()
@@ -159,6 +156,11 @@ AssembleContinuityEdgeSolverAlgorithm::execute()
 
       const double densityL = *stk::mesh::field_data(densityNp1, nodeL);
       const double densityR = *stk::mesh::field_data(densityNp1, nodeR);
+
+      const double udiagL = *stk::mesh::field_data(*Udiag, nodeL);
+      const double udiagR = *stk::mesh::field_data(*Udiag, nodeR);
+
+      const double projTimeScale = 0.5 * (1.0/udiagL + 1.0/udiagR);
 
       // compute geometry
       double axdx = 0.0;

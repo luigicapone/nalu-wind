@@ -800,11 +800,6 @@ LowMachEquationSystem::project_nodal_velocity()
 
   stk::mesh::MetaData & meta_data = realm_.meta_data();
 
-  // time step
-  const double dt = realm_.get_time_step();
-  const double gamma1 = realm_.get_gamma1();
-  const double projTimeScale = dt/gamma1;
-
   const int nDim = meta_data.spatial_dimension();
 
   // field that we need
@@ -813,6 +808,7 @@ LowMachEquationSystem::project_nodal_velocity()
   VectorFieldType *uTmp = momentumEqSys_->uTmp_;
   VectorFieldType *dpdx = continuityEqSys_->dpdx_;
   ScalarFieldType &densityNp1 = density_->field_of_state(stk::mesh::StateNP1);
+  ScalarFieldType *Udiag = momentumEqSys_->Udiag_;
 
   //==========================================================
   // save off dpdx to uTmp (do it everywhere)
@@ -863,11 +859,12 @@ LowMachEquationSystem::project_nodal_velocity()
     double * ut = stk::mesh::field_data(*uTmp, b);
     double * dp = stk::mesh::field_data(*dpdx, b);
     double * rho = stk::mesh::field_data(densityNp1, b);
+    double * udiagN = stk::mesh::field_data(*Udiag, b);
     
     for ( stk::mesh::Bucket::size_type k = 0 ; k < length ; ++k ) {
       
       // Get scaling factor
-      const double fac = projTimeScale/rho[k];
+      const double fac = 1.0/(rho[k] * udiagN[k]);
       
       // projection step
       const size_t offSet = k*nDim;
