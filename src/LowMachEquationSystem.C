@@ -721,6 +721,20 @@ LowMachEquationSystem::solve_and_update()
     // project nodal velocity
     project_nodal_velocity();
 
+    // update pressure
+    const std::string dofName="pressure";
+    const double relaxFP = realm_.solutionOptions_->get_relaxation_factor(dofName);
+    timeA = NaluEnv::self().nalu_time();
+    field_axpby(
+      realm_.meta_data(),
+      realm_.bulk_data(),
+      (relaxFP - 1.0), *continuityEqSys_->pTmp_,
+      1.0, *continuityEqSys_->pressure_,
+      realm_.get_activate_aura());
+    continuityEqSys_->compute_projected_nodal_gradient();
+    timeB = NaluEnv::self().nalu_time();
+    continuityEqSys_->timerAssemble_ += (timeB-timeA);
+
     // compute velocity relative to mesh with new velocity
     realm_.compute_vrtm();
 
