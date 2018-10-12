@@ -238,10 +238,10 @@ AssembleContinuityEdgeOpenSolverAlgorithm::execute()
         }
 
         // rhs
-        p_rhs[nearestNode] -= tmdot/projTimeScale;
+        p_rhs[nearestNode] -= tmdot;
 
         // lhs right; IR, IL; IR, IR
-        double lhsfac = asq*inv_axdx*pstabFac;
+        double lhsfac = asq*inv_axdx*pstabFac*projTimeScale;
         p_lhs[rowR+nearestNode] += 0.5*lhsfac;
         p_lhs[rowR+opposingNode] += 0.5*lhsfac;
       }

@@ -188,7 +188,7 @@ AssembleContinuityEdgeSolverAlgorithm::execute()
           - projTimeScale*kxj*GjIp*nocFac;
       }
 
-      const double lhsfac = -asq*inv_axdx;
+      const double lhsfac = -asq*inv_axdx*projTimeScale;
 
       /*
         lhs[0] = IL,IL; lhs[1] = IL,IR; IR,IL; IR,IR
@@ -197,12 +197,12 @@ AssembleContinuityEdgeSolverAlgorithm::execute()
       // first left
       p_lhs[0] = -lhsfac;
       p_lhs[1] = +lhsfac;
-      p_rhs[0] = -tmdot/projTimeScale;
+      p_rhs[0] = -tmdot;
 
       // now right
       p_lhs[2] = +lhsfac;
       p_lhs[3] = -lhsfac;
-      p_rhs[1] = tmdot/projTimeScale;
+      p_rhs[1] = tmdot;
 
       apply_coeff(connected_nodes, scratchIds, scratchVals, rhs, lhs, __FILE__);
 
