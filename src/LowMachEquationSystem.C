@@ -2402,6 +2402,12 @@ MomentumEquationSystem::assemble_and_solve(
   std::vector<const stk::mesh::FieldBase*> fVec{Udiag_};
 
   if (realm_.solutionOptions_->tscaleType_ == TSCALE_UDIAGINV) {
+    const std::string dofName = "velocity";
+    const double dt = realm_.get_time_step();
+    const double gamma1 = realm_.get_gamma1();
+    const double projTimeScale = gamma1 / dt;
+    const double alphaU = realm_.solutionOptions_->get_relaxation_factor(dofName);
+
     stk::mesh::parallel_sum(bulk, fVec);
     const auto sel = stk::mesh::selectField(*Udiag_)
       & meta.locally_owned_part()
@@ -2414,8 +2420,10 @@ MomentumEquationSystem::assemble_and_solve(
       double* rho = (double*) stk::mesh::field_data(*density, *b);
       double* dVol = (double*) stk::mesh::field_data(*dualVol, *b);
 
-      for (size_t in=0; in < b->size(); in++)
+      for (size_t in=0; in < b->size(); in++) {
         field[in] /= (rho[in] * dVol[in]);
+        field[in] = (field[in] - projTimeScale) * alphaU + projTimeScale;
+      }
     }
   }
 
