@@ -251,7 +251,7 @@ SolutionOptions::load(const YAML::Node & y_node)
           y_option["upw_factor"] >> upwMap_ ;
         }
         else if (expect_map(y_option, "relaxation_factor", optional)) {
-          y_option["relaxtion_factor"] >> relaxFactorMap_;
+          y_option["relaxation_factor"] >> relaxFactorMap_;
         }
         else if (expect_map(y_option, "limiter", optional)) {
           y_option["limiter"] >> limiterMap_ ;
