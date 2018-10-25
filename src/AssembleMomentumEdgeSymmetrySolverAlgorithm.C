@@ -24,6 +24,8 @@
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Part.hpp>
 
+#include <cmath>
+
 namespace sierra{
 namespace nalu{
 
@@ -273,7 +275,7 @@ AssembleMomentumEdgeSymmetrySolverAlgorithm::execute()
           p_rhs[indexR] -= diffFlux;
           double lhsFac = -viscBip*asq*inv_axdx*nx[i]*nx[i];
           p_lhs[rRiL_i] -= lhsFac;
-          p_lhs[rRiR_i] += lhsFac / relaxFacU;
+          p_lhs[rRiR_i] += std::fabs(lhsFac / relaxFacU);
 
           const double axi = areaVec[faceOffSet+i];
           const double nxnx = nx[i]*nx[i];
@@ -289,7 +291,7 @@ AssembleMomentumEdgeSymmetrySolverAlgorithm::execute()
             const int rRiR_j = rowR+colR;
 
             p_lhs[rRiL_j] -= lhsFac;
-            p_lhs[rRiR_j] += lhsFac / relaxFacU;
+            p_lhs[rRiR_j] += std::fabs(lhsFac / relaxFacU);
 
             if ( i == j ) {
               // nothing
@@ -298,15 +300,15 @@ AssembleMomentumEdgeSymmetrySolverAlgorithm::execute()
 
               lhsFac = -viscBip*asq*inv_axdx*nx[i]*nx[j];
               p_lhs[rRiL_j] -= lhsFac;
-              p_lhs[rRiR_j] += lhsFac / relaxFacU;
+              p_lhs[rRiR_j] += std::fabs(lhsFac / relaxFacU);
 
               lhsFac = -viscBip*axj*axj*nx[i]*nx[j];
               p_lhs[rRiL_j] -= lhsFac;
-              p_lhs[rRiR_j] += lhsFac / relaxFacU;
+              p_lhs[rRiR_j] += std::fabs(lhsFac / relaxFacU);
 
               lhsFac = -viscBip*axj*axi*nx[i]*nx[j];
               p_lhs[rRiL_i] -= lhsFac;
-              p_lhs[rRiR_i] += lhsFac / relaxFacU;
+              p_lhs[rRiR_i] += std::fabs(lhsFac / relaxFacU);
             }
           }
         }

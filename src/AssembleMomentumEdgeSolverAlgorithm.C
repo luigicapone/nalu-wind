@@ -22,6 +22,8 @@
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Part.hpp>
 
+#include <cmath>
+
 namespace sierra{
 namespace nalu{
 
@@ -362,22 +364,22 @@ AssembleMomentumEdgeSolverAlgorithm::execute()
         // upwind advection (includes 4th); left node
         double alhsfac = 0.5*(tmdot+std::abs(tmdot))*pecfac*alphaUpw
           + 0.5*alpha*om_pecfac*tmdot;
-        p_lhs[rLiL] += alhsfac / relaxFacU;
+        p_lhs[rLiL] += std::fabs(alhsfac / relaxFacU);
         p_lhs[rRiL] -= alhsfac;
 
         // upwind advection (incldues 4th); right node
         alhsfac = 0.5*(tmdot-std::abs(tmdot))*pecfac*alphaUpw
           + 0.5*alpha*om_pecfac*tmdot;
-        p_lhs[rRiR] -= alhsfac / relaxFacU;
+        p_lhs[rRiR] += std::fabs(alhsfac / relaxFacU);
         p_lhs[rLiR] += alhsfac;
 
         // central; left; collect terms on alpha and alphaUpw
         alhsfac = 0.5*tmdot*(pecfac*om_alphaUpw + om_pecfac*om_alpha);
-        p_lhs[rLiL] += alhsfac / relaxFacU;
+        p_lhs[rLiL] += std::fabs(alhsfac / relaxFacU);
         p_lhs[rLiR] += alhsfac;
         // central; right
         p_lhs[rRiL] -= alhsfac;
-        p_lhs[rRiR] -= alhsfac / relaxFacU;
+        p_lhs[rRiR] += std::fabs(alhsfac / relaxFacU);
 
         //==============================
         // diffusion second
@@ -385,12 +387,12 @@ AssembleMomentumEdgeSolverAlgorithm::execute()
         const double axi = p_areaVec[i];
 
         //diffusion; row IL
-        p_lhs[rLiL] -= dlhsfac / relaxFacU;
+        p_lhs[rLiL] += std::fabs(dlhsfac / relaxFacU);
         p_lhs[rLiR] += dlhsfac;
 
         // diffusion; row IR
         p_lhs[rRiL] += dlhsfac;
-        p_lhs[rRiR] -= dlhsfac / relaxFacU;
+        p_lhs[rRiR] += std::fabs(dlhsfac / relaxFacU);
 
         // more diffusion; see theory manual
         for ( int j = 0; j < nDim; ++j ) {
@@ -400,12 +402,12 @@ AssembleMomentumEdgeSolverAlgorithm::execute()
           const int colR = j + nDim;
 
           // first left; IL,IL; IL,IR
-          p_lhs[rowL + colL] -= lhsfacNS / relaxFacU;
+          p_lhs[rowL + colL] += std::fabs(lhsfacNS / relaxFacU);
           p_lhs[rowL + colR] += lhsfacNS;
 
           // now right, IR,IL; IR,IR
           p_lhs[rowR + colL] += lhsfacNS;
-          p_lhs[rowR + colR] -= lhsfacNS / relaxFacU;
+          p_lhs[rowR + colR] += std::fabs(lhsfacNS / relaxFacU);
         }
 
       }

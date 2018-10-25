@@ -24,6 +24,8 @@
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Part.hpp>
 
+#include <cmath>
+
 namespace sierra{
 namespace nalu{
 
@@ -298,7 +300,7 @@ AssembleMomentumEdgeOpenSolverAlgorithm::execute()
           p_rhs[indexR] -= diffFlux;
           double lhsFac = -viscBip*asq*inv_axdx*om_nxinxi;
           p_lhs[rRiL_i] -= lhsFac;
-          p_lhs[rRiR_i] += lhsFac / relaxFacU;
+          p_lhs[rRiR_i] += std::fabs(lhsFac / relaxFacU);
 
           const double axi = areaVec[faceOffSet+i];
 
@@ -313,7 +315,7 @@ AssembleMomentumEdgeOpenSolverAlgorithm::execute()
             const int rRiR_j = rowR+colR;
 
             p_lhs[rRiL_j] -= lhsFac;
-            p_lhs[rRiR_j] += lhsFac / relaxFacU;
+            p_lhs[rRiR_j] += std::fabs(lhsFac / relaxFacU);
 
             if ( i == j ) {
               // nothing
@@ -323,15 +325,15 @@ AssembleMomentumEdgeOpenSolverAlgorithm::execute()
 
               lhsFac = viscBip*asq*inv_axdx*nxinxj;
               p_lhs[rRiL_j] -= lhsFac;
-              p_lhs[rRiR_j] += lhsFac / relaxFacU;
+              p_lhs[rRiR_j] += std::fabs(lhsFac / relaxFacU);
 
               lhsFac = viscBip*axj*axj*inv_axdx*nxinxj;
               p_lhs[rRiL_j] -= lhsFac;
-              p_lhs[rRiR_j] += lhsFac / relaxFacU;
+              p_lhs[rRiR_j] += std::fabs(lhsFac / relaxFacU);
 
               lhsFac = viscBip*axj*axi*inv_axdx*nxinxj;
               p_lhs[rRiL_i] -= lhsFac;
-              p_lhs[rRiR_i] += lhsFac / relaxFacU;
+              p_lhs[rRiR_i] += std::fabs(lhsFac / relaxFacU);
             }
           }
         }
